@@ -1,4 +1,4 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native'
 
 const style = StyleSheet.create({
   container: {
@@ -25,6 +25,6 @@ const style = StyleSheet.create({
     paddingVertical: 8,
     fontWeight: '300',
   },
-});
+})
 
-export {style};
+export { style }

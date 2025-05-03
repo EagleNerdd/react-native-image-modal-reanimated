@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
-import { Animated, Dimensions, Platform, StatusBar, StyleSheet } from 'react-native'
+import { Dimensions, Platform, StatusBar, StyleSheet } from 'react-native'
+import Animated, { interpolate, type SharedValue, useAnimatedStyle } from 'react-native-reanimated'
 
 const styles = StyleSheet.create({
   clippingArea: {
@@ -9,7 +10,7 @@ const styles = StyleSheet.create({
 })
 
 interface Props {
-  readonly animatedFrame: Animated.Value
+  readonly animatedFrame: SharedValue<number>
   readonly parentLayout?: {
     readonly x: number
     readonly y: number
@@ -36,28 +37,23 @@ const DisplayImageArea = ({
   const statusBarHeight =
     isTranslucent && Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 0
 
-  const animationStyle = {
-    left: animatedFrame.interpolate({
-      inputRange: [0, 1],
-      outputRange: [parentLayout?.x ?? 0, 0],
-    }),
-    top: animatedFrame.interpolate({
-      inputRange: [0, 1],
-      outputRange: [(parentLayout?.y ?? 0) + statusBarHeight, 0],
-    }),
-    width: animatedFrame.interpolate({
-      inputRange: [0, 1],
-      outputRange: [parentLayout?.width ?? windowWidth, windowWidth],
-    }),
-    height: animatedFrame.interpolate({
-      inputRange: [0, 1],
-      outputRange: [parentLayout?.height ?? windowHeight, windowHeight],
-    }),
-  }
-
+  const animatedStyle = useAnimatedStyle(() => ({
+    left: interpolate(animatedFrame.value, [0, 1], [parentLayout?.x ?? 0, 0]),
+    top: interpolate(animatedFrame.value, [0, 1], [(parentLayout?.y ?? 0) + statusBarHeight, 0]),
+    width: interpolate(
+      animatedFrame.value,
+      [0, 1],
+      [parentLayout?.width ?? windowWidth, windowWidth],
+    ),
+    height: interpolate(
+      animatedFrame.value,
+      [0, 1],
+      [parentLayout?.height ?? windowHeight, windowHeight],
+    ),
+  }))
   return (
     <Animated.View
-      style={[styles.clippingArea, animationStyle]}
+      style={[styles.clippingArea, animatedStyle]}
       renderToHardwareTextureAndroid={renderToHardwareTextureAndroid}
     >
       {children}

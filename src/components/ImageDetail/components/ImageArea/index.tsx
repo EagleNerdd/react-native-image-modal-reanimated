@@ -1,7 +1,8 @@
 import { useRef } from 'react'
 import type { ReactNode, RefObject } from 'react'
 
-import { Animated, Image, PanResponder, StyleSheet, View } from 'react-native'
+import { Image, PanResponder, StyleSheet, View } from 'react-native'
+import Animated, { type SharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated'
 
 import {
   getCenterPositionBetweenTouches,
@@ -50,12 +51,18 @@ interface Props {
   readonly swipeToDismiss: boolean
   readonly isAnimated: RefObject<boolean>
   readonly animationDuration: number
-  readonly animatedOpacity: Animated.Value
-  readonly animatedScale: Animated.Value
-  readonly animatedPosition: Animated.ValueXY
-  readonly animatedImagePosition: Animated.ValueXY
-  readonly animatedImageWidth: Animated.Value
-  readonly animatedImageHeight: Animated.Value
+  readonly animatedOpacity: SharedValue<number>
+  readonly animatedScale: SharedValue<number>
+  readonly animatedPosition: SharedValue<{
+    readonly x: number
+    readonly y: number
+  }>
+  readonly animatedImagePosition: SharedValue<{
+    readonly x: number
+    readonly y: number
+  }>
+  readonly animatedImageWidth: SharedValue<number>
+  readonly animatedImageHeight: SharedValue<number>
   readonly isModalOpen: boolean
   renderImageComponent?(params: RenderImageComponentParams): ReactNode
   onClose(): void
@@ -127,7 +134,7 @@ const ImageArea = ({
 
     const scale = _scale.current
     _position.current = getImagePositionFromDistanceInScale(scale, _position.current, newDistance)
-    animatedPosition.setValue(_position.current)
+    animatedPosition.value = _position.current
 
     const opacity = getOpacityFromSwipe({
       swipeToDismiss,
@@ -135,7 +142,7 @@ const ImageArea = ({
       dy,
       windowHeight,
     })
-    animatedOpacity.setValue(opacity)
+    animatedOpacity.value = opacity
   }
 
   const pinchZoom = (event: GestureResponderEvent) => {
@@ -150,7 +157,7 @@ const ImageArea = ({
       const distanceDiff = (_zoomCurrentDistance.current - _zoomLastDistance.current) / 200
       const zoom = getZoomFromDistance(_scale.current, distanceDiff)
       _scale.current = zoom
-      animatedScale.setValue(_scale.current)
+      animatedScale.value = _scale.current
 
       // Update image position
       _position.current = getPositionFromDistanceInScale({
@@ -159,7 +166,7 @@ const ImageArea = ({
         distanceDiff,
         zoom,
       })
-      animatedPosition.setValue(_position.current)
+      animatedPosition.value = _position.current
     }
     _zoomLastDistance.current = _zoomCurrentDistance.current
   }
@@ -177,20 +184,12 @@ const ImageArea = ({
 
   const animateToPosition = (position: { x: number; y: number }) => {
     _position.current = position
-    Animated.timing(animatedPosition, {
-      toValue: _position.current,
-      duration: animationDuration,
-      useNativeDriver: false,
-    }).start()
+    animatedPosition.value = withTiming(_position.current, { duration: animationDuration })
   }
 
   const animateToScale = (scale: number) => {
     _scale.current = scale
-    Animated.timing(animatedScale, {
-      toValue: _scale.current,
-      duration: animationDuration,
-      useNativeDriver: false,
-    }).start()
+    animatedScale.value = withTiming(_scale.current, { duration: animationDuration })
   }
 
   const handlePanResponderReleaseResolve = (changedTouchesCount: number): void => {
@@ -228,11 +227,7 @@ const ImageArea = ({
     animateToPosition({ x: 0, y: 0 })
 
     // And background should return to its normal opacity.
-    Animated.timing(animatedOpacity, {
-      toValue: VISIBLE_OPACITY,
-      duration: animationDuration,
-      useNativeDriver: false,
-    }).start()
+    animatedOpacity.value = withTiming(VISIBLE_OPACITY, { duration: animationDuration })
 
     triggerOnMove('onPanResponderRelease')
   }
@@ -338,7 +333,23 @@ const ImageArea = ({
     onPanResponderMove: handlePanResponderMove,
     onPanResponderRelease: handlePanResponderRelease,
   })
-
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        scale: animatedScale.value,
+      },
+      {
+        translateX: animatedPosition.value.x,
+      },
+      {
+        translateY: animatedPosition.value.y,
+      },
+    ],
+    left: animatedImagePosition.value.x,
+    top: animatedImagePosition.value.y,
+    width: animatedImageWidth.value,
+    height: animatedImageHeight.value,
+  }))
   return (
     <View
       style={{
@@ -348,23 +359,7 @@ const ImageArea = ({
       {..._imagePanResponder.panHandlers}
     >
       <Animated.View
-        style={{
-          transform: [
-            {
-              scale: animatedScale,
-            },
-            {
-              translateX: animatedPosition.x,
-            },
-            {
-              translateY: animatedPosition.y,
-            },
-          ],
-          left: animatedImagePosition.x,
-          top: animatedImagePosition.y,
-          width: animatedImageWidth,
-          height: animatedImageHeight,
-        }}
+        style={animatedStyle}
         renderToHardwareTextureAndroid={renderToHardwareTextureAndroid}
       >
         {typeof renderImageComponent === 'function' ? (

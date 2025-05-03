@@ -1,6 +1,8 @@
-import { Animated, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 
 import type { ColorValue } from 'react-native'
+import type { SharedValue } from 'react-native-reanimated'
 
 const styles = StyleSheet.create({
   background: {
@@ -13,7 +15,7 @@ const styles = StyleSheet.create({
 })
 
 interface Props {
-  readonly animatedOpacity: Animated.Value
+  readonly animatedOpacity: SharedValue<number>
   readonly backgroundColor: ColorValue
   readonly renderToHardwareTextureAndroid: boolean
 }
@@ -23,10 +25,13 @@ const Background = ({
   backgroundColor,
   renderToHardwareTextureAndroid,
 }: Props) => {
+  const animatedStyles = useAnimatedStyle(() => ({
+    opacity: animatedOpacity.value,
+  }))
   return (
     <Animated.View
       renderToHardwareTextureAndroid={renderToHardwareTextureAndroid}
-      style={[styles.background, { backgroundColor }, { opacity: animatedOpacity }]}
+      style={[styles.background, { backgroundColor }, animatedStyles]}
     />
   )
 }

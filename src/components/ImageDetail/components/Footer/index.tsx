@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react'
 
-import { Animated, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+
+import type { SharedValue } from 'react-native-reanimated'
 
 const styles = StyleSheet.create({
   footer: {
@@ -14,7 +17,7 @@ const styles = StyleSheet.create({
 
 interface Props {
   readonly renderToHardwareTextureAndroid: boolean
-  readonly animatedOpacity: Animated.Value
+  readonly animatedOpacity: SharedValue<number>
   renderFooter?(close: () => void): ReactNode
   onClose(): void
 }
@@ -25,18 +28,17 @@ const Footer = ({
   renderFooter,
   onClose,
 }: Props) => {
+  const animatedStyles = useAnimatedStyle(() => ({
+    opacity: animatedOpacity.value,
+  }))
   if (typeof renderFooter !== 'function') {
     return
-  }
-
-  const animationStyle = {
-    opacity: animatedOpacity,
   }
 
   return (
     <Animated.View
       renderToHardwareTextureAndroid={renderToHardwareTextureAndroid}
-      style={[styles['footer'], animationStyle]}
+      style={[styles['footer'], animatedStyles]}
     >
       {renderFooter(onClose)}
     </Animated.View>

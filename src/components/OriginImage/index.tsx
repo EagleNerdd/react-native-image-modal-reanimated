@@ -1,14 +1,16 @@
 import type { ReactNode } from 'react'
 
-import { Animated, Image, TouchableOpacity } from 'react-native'
+import { Image, TouchableOpacity } from 'react-native'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
 
 import type { RenderImageComponentParams } from '../../types'
 import type { ImageResizeMode, ImageSourcePropType, ImageStyle, StyleProp } from 'react-native'
+import type { SharedValue } from 'react-native-reanimated'
 
 interface Props {
   readonly source: ImageSourcePropType
   readonly resizeMode: ImageResizeMode
-  readonly imageOpacity: Animated.Value
+  readonly imageOpacity: SharedValue<number>
   readonly renderToHardwareTextureAndroid: boolean
   readonly disabled: boolean
   readonly style?: StyleProp<ImageStyle>
@@ -36,11 +38,13 @@ const OriginImage = ({
     }
     onDialogOpen()
   }
-
+  const animatedStyles = useAnimatedStyle(() => ({
+    opacity: imageOpacity.value,
+  }))
   return (
     <Animated.View
       renderToHardwareTextureAndroid={renderToHardwareTextureAndroid}
-      style={[{ opacity: imageOpacity }]}
+      style={animatedStyles}
     >
       <TouchableOpacity
         activeOpacity={1}

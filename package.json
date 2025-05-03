@@ -1,6 +1,6 @@
 {
   "name": "react-native-image-modal",
-  "version": "3.0.13",
+  "version": "3.1.0",
   "description": "image full screen modal for react native",
   "type": "module",
   "main": "dist/index.js",
@@ -16,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dev-yakuza/react-native-image-modal.git"
+    "url": "git+https://github.com/pfndesign/react-native-image-modal-reanimated.git"
   },
   "keywords": [
     "react-native",
@@ -30,12 +30,12 @@
     "image",
     "gallery"
   ],
-  "author": "dev-yakuza <dev.yakuza@gmail.com>",
+  "author": "pfndesign <pfndesign@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/dev-yakuza/react-native-image-modal/issues"
+    "url": "https://github.com/pfndesign/react-native-image-modal-reanimated/issues"
   },
-  "homepage": "https://github.com/dev-yakuza/react-native-image-modal#readme",
+  "homepage": "https://github.com/pfndesign/react-native-image-modal-reanimated#readme",
   "devDependencies": {
     "@eslint/js": "^9.19.0",
     "@types/react": "19.0.8",
@@ -56,7 +56,8 @@
     "lefthook": "^1.10.10",
     "prettier": "3.4.2",
     "react": "19.0.0",
-    "react-native": "0.77.0",
+    "react-native": "0.79.2",
+    "react-native-reanimated": "~3.17.4",
     "typescript": "5.7.3",
     "typescript-eslint": "^8.21.0"
   }

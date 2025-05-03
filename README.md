@@ -4,6 +4,10 @@
 
 You can pinch zoom-in/out, double-tap zoom-in/out, move and swipe-to-dismiss.
 
+now with reanimated
+
+credit to : dev-yakuza
+
 ## Document
 
 - [Blog](#blog)

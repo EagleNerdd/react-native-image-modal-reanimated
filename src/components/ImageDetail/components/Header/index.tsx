@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react'
 
-import { Animated, SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { SafeAreaView, StatusBar, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import Animated, { useAnimatedStyle } from 'react-native-reanimated'
+
+import type { SharedValue } from 'react-native-reanimated'
 
 const styles = StyleSheet.create({
   closeButton: {
@@ -26,7 +29,7 @@ interface Props {
   readonly isTranslucent: boolean
   readonly hideCloseButton: boolean
   readonly renderToHardwareTextureAndroid: boolean
-  readonly animatedOpacity: Animated.Value
+  readonly animatedOpacity: SharedValue<number>
   renderHeader?(close: () => void): ReactNode
   onClose(): void
 }
@@ -39,17 +42,17 @@ const Header = ({
   renderHeader,
   onClose,
 }: Props) => {
+  const animatedStyles = useAnimatedStyle(() => ({
+    opacity: animatedOpacity.value,
+  }))
   if (hideCloseButton) return
 
-  const animationStyle = {
-    opacity: animatedOpacity,
-  }
   const marginTop = isTranslucent ? StatusBar.currentHeight : 0
 
   return (
     <Animated.View
       renderToHardwareTextureAndroid={renderToHardwareTextureAndroid}
-      style={animationStyle}
+      style={animatedStyles}
     >
       {typeof renderHeader === 'function' ? (
         renderHeader(onClose)

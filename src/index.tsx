@@ -1,7 +1,8 @@
 import type { ReactNode, RefObject } from 'react'
-import { createRef, forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import { createRef, forwardRef, useImperativeHandle, useState } from 'react'
 
-import { Animated, View } from 'react-native'
+import { View } from 'react-native'
+import { useSharedValue, withTiming } from 'react-native-reanimated'
 
 import { ImageDetailComponent, OriginImage } from './components'
 import { useOriginImageLayout } from './hooks'
@@ -228,7 +229,7 @@ const ImageModal = forwardRef<ReactNativeImageModal, Props>(function ImageModal(
   const imageRef = createRef<View>()
   const imageDetailRef = modalRef ?? createRef<ImageDetail>()
   // If don't use useRef, animation will not work
-  const originImageOpacity = useRef(new Animated.Value(VISIBLE_OPACITY)).current
+  const originImageOpacity = useSharedValue(VISIBLE_OPACITY)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const { originImageLayout, updateOriginImageLayout } = useOriginImageLayout({
     imageRef,
@@ -253,15 +254,11 @@ const ImageModal = forwardRef<ReactNativeImageModal, Props>(function ImageModal(
 
   const handleOpen = (): void => {
     showModal()
-    Animated.timing(originImageOpacity, {
-      toValue: INVISIBLE_OPACITY,
-      duration: animationDuration,
-      useNativeDriver: false,
-    }).start()
+    originImageOpacity.value = withTiming(INVISIBLE_OPACITY, { duration: animationDuration })
   }
 
   const handleClose = (): void => {
-    originImageOpacity.setValue(VISIBLE_OPACITY)
+    originImageOpacity.value = VISIBLE_OPACITY
     hideModal()
   }
 

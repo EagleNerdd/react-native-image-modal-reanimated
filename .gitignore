@@ -1,3 +1,7 @@
 node_modules
 dist
 Develop/dist
+Develop/android
+Develop/ios
+Develop/web
+Develop/.expo
