@@ -1,4 +1,4 @@
-# react-native-image-modal
+# react-native-image-modal-reanimated
 
 `react-native-image-modal` is a simple full size modal image for iOS and Android.
 
