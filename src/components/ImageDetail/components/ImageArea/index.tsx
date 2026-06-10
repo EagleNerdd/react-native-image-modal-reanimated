@@ -109,8 +109,8 @@ const ImageArea = ({
   const _lastClickTime = useRef(0)
   const _isDoubleClick = useRef(false)
   const _isLongPress = useRef(false)
-  const _singleTapTimeout = useRef<NodeJS.Timeout | undefined>(undefined)
-  const _longPressTimeout = useRef<NodeJS.Timeout | undefined>(undefined)
+  const _singleTapTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const _longPressTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const clearLongPressTimeout = () => {
     if (_longPressTimeout.current) {
